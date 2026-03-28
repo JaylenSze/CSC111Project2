@@ -1,5 +1,13 @@
-"""
-Final Project
+"""CSC111 Winter 2026 Project 2
+
+Instructions (READ THIS FIRST!)
+===============================
+This Python module contains the graph and vertex classes along with a lot of the
+functions used for the project.
+
+Copyright and Usage Information
+===============================
+This file is Copyright (c) 2026 Jaylen, Sheena, Thomas, Ivans
 """
 
 from __future__ import annotations
@@ -12,16 +20,16 @@ import matplotlib.pyplot as plt
 
 
 class _Vertex:
-    """A vertex in the graph that represents a wikipedia page
-
+    """A vertex in the graph that represents a Wikipedia page.
 
     Instance Attributes:
-       - page_name: The name of the wikipedia page this node represents
-       - neighbours: Article pages that exist within a current wikipedia page
-
+       - page_name: The name of the Wikipedia page this node represents.
+       - neighbours: Article pages that can be navigated to directly from this current Wikipedia page.
 
     Representation Invariants:
        - self not in self.neighbours
+       - self.page_name != ""
+       - all(isinstance(v, _Vertex) for v in self.neighbours)
        - self.page_name is the name of a valid wikipedia page
        - the wikipedia that self.page_name represents links to all pages represented by vertices in self.neighbours
     """
@@ -30,6 +38,7 @@ class _Vertex:
 
     def __init__(self, page_name: str) -> None:
         """Initialize a new vertex with the given page_name. Initialized with no neighbours.
+
         Preconditions:
            - page_name is the name of a valid wikipedia page
         """
@@ -40,10 +49,8 @@ class _Vertex:
         """ Returns a sorted list of length num_neighbours. Elements of the list are the names of randomly
         chosen vertices that are neighbours to self. The returned list will have include as an element
 
-
         If the length of self.neighbours is less than num_neighbors, it will return a sorted list of the names of
         all neighbouring vertices.
-
 
         Preconditions:
             - len(self.neighbours) > 0
@@ -65,6 +72,7 @@ class Graph:
     #     - _vertices:
     #         A collection of the articles contained in this graph.
     #         Maps item to _Vertex object.
+
     _vertices: dict[Any, _Vertex]
 
     def __init__(self) -> None:
@@ -74,13 +82,8 @@ class Graph:
     def add_vertex(self, item: Any) -> None:
         """Add an article with a given name to this graph.
 
-
         The new vertex is not adjacent to any other vertices.
         Do nothing if the given item is already in this graph.
-
-
-        Preconditions:
-           - kind in {'user', 'book'}
         """
         if item not in self._vertices:
             self._vertices[item] = _Vertex(item)
@@ -88,9 +91,7 @@ class Graph:
     def add_edge(self, item1: Any, item2: Any) -> None:
         """Add an edge between the two vertices with the given items in this graph.
 
-
         Raise a ValueError if item1 or item2 do not appear as vertices in this graph.
-
 
         Preconditions:
            - item1 != item2
@@ -118,6 +119,8 @@ class Graph:
     def random_start_end_point(self) -> tuple[str, str]:
         """ Chooses a random starting article to begin with and a random article
         to finish on to complete the game
+        Preconditions:
+            - len(self._vertices) >= 2
         """
 
         items = list(self._vertices.keys())
@@ -133,6 +136,12 @@ class Graph:
         """
         Returns length of shortest path as well as the first page on this path. Uses Breadth First Search (BFS)
         to find the shortest path, along with a previous array to store the path.
+
+        Preconditions:
+            - start in self._vertices
+            - end in self._vertices
+            - start != end
+
         >>> graph = Graph()
         >>> graph.add_vertex(1)
         >>> graph.add_vertex(2)
@@ -174,7 +183,14 @@ class Graph:
 
     def shortest_path_list(self, start: Any, end: Any) -> list[Any]:
         """
-        Returns length of shortest path as well as the first page on this path.
+        Returns a list of pages that represent the shortest path. Uses Breadth First Search (BFS)
+        to find the shortest path, along with a previous array to store the path.
+
+        Preconditions:
+            - start in self._vertices
+            - end in self._vertices
+            - start != end
+
         >>> graph = Graph()
         >>> graph.add_vertex(1)
         >>> graph.add_vertex(2)
@@ -218,8 +234,8 @@ class Graph:
         return path
 
     def get_vertex(self, name: str) -> _Vertex:
-        """ Returns the vertex in self that has name as its page_name. If no such vertex exists, raise ValueError
-
+        """ Returns the vertex in self that has name as its page_name.
+        If no such vertex exists, raise ValueError
 
         Preconditions:
            - name in self._vertices
@@ -229,7 +245,8 @@ class Graph:
         raise ValueError
 
     def prune_graph(self) -> None:
-        """ Removes all the vertices in the graph which have no neighbours. Removes them from self._vertices and from
+        """ Removes all the vertices in the graph which have no neighbours.
+        Removes them from self._vertices and from
         the set of neighbours of each vertex in the graph
         """
         deleted = set()
@@ -253,11 +270,17 @@ class Graph:
         for page in self._vertices:
             for neighbour in self._vertices[page].neighbours:
                 nx_graph.add_edge(page, neighbour.page_name)
+        plt.figure()
         nx.draw(nx_graph, with_labels=True)
+        plt.show()
 
 
 def load_wikipedia_graph(wikipedia_file: str) -> Graph:
-    """Return a graph of all available articles that can be accessed within the game
+    """Return a populated Graph of all available articles and links parsed
+    from a given CSV file.
+
+    Preconditions:
+        - wikipedia_file is a valid path to a CSV file in the correct format
     """
     graph = Graph()
     with open(wikipedia_file, newline='', encoding='utf-8') as csvfile:
@@ -272,11 +295,17 @@ def load_wikipedia_graph(wikipedia_file: str) -> Graph:
 
 
 def line_graph(lengths: list[int]) -> None:
-    """ Plots a line graph. The points on the line graph have coordinates (i+1, lengths[i])
+    """Plots a line graph tracking the shortest path length over time.
+        The points on the line graph have coordinates (i+1, lengths[i]).
+
+    Preconditions:
+        - len(lengths) > 0
     """
     move = []
     for i in range(len(lengths)):
-        move.append(i+1)
+        move.append(i + 1)
+
+    plt.figure()
     plt.plot(move, lengths, marker=".", linestyle="-")
     plt.title("Length of Shortest Path Over Time")
     plt.xlabel("Move Number")
@@ -286,34 +315,39 @@ def line_graph(lengths: list[int]) -> None:
     plt.show()
 
 
-def visualize_path(self, sequence: list[str]) -> None:
-    """
-    Visualizes the path using networks in which a network is created by
-    Each wikipedia page (vertex) is illustrated as a node
-    Each edge is shown as a connection between each node
-    """
+def visualize_path(sequence: list[str]) -> None:
+    """Visualizes a specific path sequence using the networkx library.
+        Each Wikipedia page in the sequence is illustrated as a node.
+        The path taken is shown as directed connections between the nodes.
 
+    Preconditions:
+        - len(sequence) >= 2
+    """
     nx_graph = nx.Graph()
     for page in sequence:
         nx_graph.add_node(page)
 
     for i in range(len(sequence) - 1):
         nx_graph.add_edge(sequence[i], sequence[i + 1])
+    plt.figure()
     nx.draw(nx_graph, with_labels=True)
+    plt.show()
 
-# if __name__ == '__main__':
+
+if __name__ == '__main__':
 
     # import python_ta.contracts
     # python_ta.contracts.check_all_contracts()
     #
-    # import doctest
-    # doctest.testmod()
+    import doctest
+    doctest.testmod()
 
     # import python_ta
     # python_ta.check_all(config={
     #     'max-line-length': 120,
+    #     'extra-imports': ['random', 'csv', 'collections', 'networkx', 'matplotlib.pyplot', 'graph'],
+    #     'allowed-io': ['load_wikipedia_graph', 'output_current_page',
+    #                    'output_ending_sequence', 'get_input', 'game_runner'],
     #     'disable': ['static_type_checker'],
-    #     'extra-imports': ['csv', 'networkx'],
-    #     'allowed-io': ['load_review_graph'],
     #     'max-nested-blocks': 4
     # })

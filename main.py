@@ -1,19 +1,28 @@
-"""
-Main file, where the code runs
+"""CSC111 Winter 2026 Project 2
 
+Instructions (READ THIS FIRST!)
+===============================
+This Python module contains the game_runner function and helper functions, along with
+main function that runs the code.
+
+Copyright and Usage Information
+===============================
+This file is Copyright (c) 2026 Jaylen, Sheena, Thomas, Ivans
 """
 
 from __future__ import annotations
-from graph import Graph
+from typing import Optional
 from graph import load_wikipedia_graph
 from graph import line_graph
 from graph import visualize_path
-from typing import Optional
 
 
 def game_runner(solution_mode: bool, hard_mode: bool) -> None:
-    """Runs the wikipedia racing game. If solution mode is True then the fastest path
-    is highlighted.
+    """Runs the Wikipedia Racing game based on user settings.
+
+        If solution_mode is True, the fastest path choice is highlighted for the player.
+        If hard_mode is True, the player has at most (2 * the shortest path length)
+        steps to reach the target end page before losing.
     """
     graph = load_wikipedia_graph("links_export.csv")
     graph.prune_graph()
@@ -60,11 +69,14 @@ def game_runner(solution_mode: bool, hard_mode: bool) -> None:
 
 
 def get_input(s: set[str], optimal_page: Optional[str] = "") -> str:
-    """ Display possible actions at this location
+    """Display possible actions (available links) at the current page and prompt user for selection.
 
-    >>> s = {"A", "B", "C", "D"}
-    >>> get_input(s, "B")
+        If optimal_page is provided (and not an empty string), it will be highlighted
+        as the recommended choice.
 
+        Preconditions:
+            - len(s) > 0
+            - optimal_page == "" or optimal_page in s
     """
     print("List of Pages you can visit: ")
     for page in s:
@@ -84,9 +96,13 @@ def get_input(s: set[str], optimal_page: Optional[str] = "") -> str:
 
 
 def output_ending_sequence(shortest_time: int, pages_visited: list[str],
-                           shortest_path: list[str], distances: list[int]):
-    """
-    Helper function, just prints out information about the game that the user played.
+                           shortest_path: list[str], distances: list[int]) -> None:
+    """Helper function to print out final statistics and visualizations about the game
+        the user just played, including their path compared to the optimal path.
+
+    Preconditions:
+        - len(pages_visited) > 0
+        - len(shortest_path) > 0
     """
     print("The shortest path time was ", shortest_time, " steps")
     print("Your path was: ")
@@ -100,7 +116,7 @@ def output_ending_sequence(shortest_time: int, pages_visited: list[str],
     line_graph(distances)
 
 
-def output_current_page(current_page: str, target_page: str):
+def output_current_page(current_page: str, target_page: str) -> None:
     """
     Helper function, just prints out current page and target page.
     """
@@ -123,12 +139,20 @@ if __name__ == '__main__':
     # import python_ta
     # python_ta.check_all(config={
     #     'max-line-length': 120,
+    #     'extra-imports': ['random', 'csv', 'collections', 'networkx', 'matplotlib.pyplot', 'graph'],
+    #     'allowed-io': ['load_wikipedia_graph', 'output_current_page',
+    #                    'output_ending_sequence', 'get_input', 'game_runner'],
     #     'disable': ['static_type_checker'],
-    #     'extra-imports': ['csv', 'networkx'],
-    #     'allowed-io': ['load_review_graph'],
     #     'max-nested-blocks': 4
     # })
+    # SOLUTION MODE UNCOMMENT FOR IT TO RUN
     # game_runner(True, False)
+
+    # SOLUTION AND HARD MODE UNCOMMENT FOR IT TO RUN
     # game_runner(True, True)
+
+    # HARD MODE
     game_runner(False, True)
 
+    # NO SOLUTION AND NO HARD MODE UNCOMMENT FOR IT TO RUN
+    # game_runner(True, True)
