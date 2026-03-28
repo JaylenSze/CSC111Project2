@@ -17,14 +17,14 @@ from graph import line_graph
 from graph import visualize_path
 
 
-def game_runner(solution_mode: bool, hard_mode: bool) -> None:
+def game_runner(solution_mode: bool, hard_mode: bool, graph_file: str, num_pages: int) -> None:
     """Runs the Wikipedia Racing game based on user settings.
 
         If solution_mode is True, the fastest path choice is highlighted for the player.
         If hard_mode is True, the player has at most (2 * the shortest path length)
         steps to reach the target end page before losing.
     """
-    graph = load_wikipedia_graph("links_export.csv")
+    graph = load_wikipedia_graph(graph_file)
     graph.prune_graph()
     tup = graph.random_start_end_point()
     current, end = tup[0], tup[1]
@@ -48,7 +48,7 @@ def game_runner(solution_mode: bool, hard_mode: bool) -> None:
         length = graph.shortest_path(current, end)[0]
         distances.append(length)
         optimal_page = graph.shortest_path(current, end)[1]
-        neighbors = set(graph.get_vertex(current).random_neighbours(6, optimal_page))
+        neighbors = set(graph.get_vertex(current).random_neighbours(num_pages, optimal_page))
 
         if solution_mode:
             current = get_input(neighbors, optimal_page)
@@ -146,13 +146,13 @@ if __name__ == '__main__':
     #     'max-nested-blocks': 4
     # })
     # SOLUTION MODE UNCOMMENT FOR IT TO RUN
-    # game_runner(True, False)
+    # game_runner(True, False, 'links_export.csv', 6)
 
     # SOLUTION AND HARD MODE UNCOMMENT FOR IT TO RUN
-    # game_runner(True, True)
+    # game_runner(True, True, 'links_export.csv', 6)
 
     # HARD MODE
-    game_runner(False, True)
+    game_runner(False, True, 'links_export.csv', 6)
 
     # NO SOLUTION AND NO HARD MODE UNCOMMENT FOR IT TO RUN
-    # game_runner(True, True)
+    # game_runner(False, False, 'links_export.csv', 6)
