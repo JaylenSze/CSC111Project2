@@ -293,6 +293,7 @@ class Graph:
                 nx_graph.add_node(x.page_name)
                 nx_graph.add_edge(page.page_name, x.page_name)
         plt.figure()
+        plt.title(node + "\nand all Pages with up to 2 Degrees of Separation")
         nx.draw(nx_graph, with_labels=True)
         plt.show()
 
