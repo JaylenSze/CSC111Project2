@@ -26,8 +26,8 @@ def game_runner(solution_mode: bool, hard_mode: bool, graph_file: str, num_pages
     """
     graph = load_wikipedia_graph(graph_file)
     graph.prune_graph()
-    tup = graph.random_start_end_point()
-    current, end = tup[0], tup[1]
+    current, end = graph.random_start_end_point()
+    start = current
     if solution_mode:
         print("SOLUTION MODE")
     if hard_mode:
@@ -45,8 +45,7 @@ def game_runner(solution_mode: bool, hard_mode: bool, graph_file: str, num_pages
         print(shortest_time * 2 - time, " Steps Remaining...")
     while current != end:
         output_current_page(current, end)
-        length = graph.shortest_path(current, end)[0]
-        distances.append(length)
+        distances.append(graph.shortest_path(current, end)[0])
         optimal_page = graph.shortest_path(current, end)[1]
         neighbors = set(graph.get_vertex(current).random_neighbours(num_pages, optimal_page))
 
@@ -66,6 +65,8 @@ def game_runner(solution_mode: bool, hard_mode: bool, graph_file: str, num_pages
 
     print("Congratulations! It took you: ", time, " steps")
     output_ending_sequence(shortest_time, pages_visited, shortest_path, distances)
+
+    graph.visualize_node(start)
 
 
 def get_input(s: set[str], optimal_page: Optional[str] = "") -> str:
@@ -108,11 +109,11 @@ def output_ending_sequence(shortest_time: int, pages_visited: list[str],
     print("Your path was: ")
     for link in pages_visited:
         print("-", link)
-    visualize_path(pages_visited)
+    visualize_path(pages_visited, "Your Path")
     print("The optimal path was: ")
     for link in shortest_path:
         print("-", link)
-    visualize_path(shortest_path)
+    visualize_path(shortest_path, "Optimal Path")
     line_graph(distances)
 
 
@@ -153,6 +154,9 @@ if __name__ == '__main__':
 
     # HARD MODE
     game_runner(False, True, 'links_export.csv', 6)
+
+    # HARD MODE (10 pages display)
+    # game_runner(False, True, 'links_export.csv', 10)
 
     # NO SOLUTION AND NO HARD MODE UNCOMMENT FOR IT TO RUN
     # game_runner(False, False, 'links_export.csv', 6)
