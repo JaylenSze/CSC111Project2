@@ -8,3 +8,4 @@ python-ta
 # Graphics and data visualization
 networkx
 matplotlib
+scipy
