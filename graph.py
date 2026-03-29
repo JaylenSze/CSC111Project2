@@ -60,8 +60,9 @@ class _Vertex:
         len_list = min(len(n_list), num_neighbours)
         final_list = random.sample(n_list, len_list)
         if include not in final_list:
+            index = random.randint(0, len(final_list) - 1)
             final_list.pop()
-            final_list.append(include)
+            final_list.insert(index, include)
         return sorted(final_list)
 
 
@@ -274,6 +275,27 @@ class Graph:
         nx.draw(nx_graph, with_labels=True)
         plt.show()
 
+    def visualize_node(self, node: str) -> None:
+        """Visualizes the graph using networks in which a network is created by NetworkX
+        Each wikipedia page (vertex) is illustrated as a node
+        Each edge is shown as a connection between each node
+        The graph only includes the node provided, the node's neighbours, and all the neighbours' neighbours
+        So it includes 2 layers of neighbours
+        """
+        nx_graph = nx.Graph()
+
+        vertex = self._vertices[node]
+        nx_graph.add_node(node)
+        for page in vertex.neighbours:
+            nx_graph.add_node(page.page_name)
+            nx_graph.add_edge(node, page.page_name)
+            for x in page.neighbours:
+                nx_graph.add_node(x.page_name)
+                nx_graph.add_edge(page.page_name, x.page_name)
+        plt.figure()
+        nx.draw(nx_graph, with_labels=True)
+        plt.show()
+
 
 def load_wikipedia_graph(wikipedia_file: str) -> Graph:
     """Return a populated Graph of all available articles and links parsed
@@ -315,7 +337,7 @@ def line_graph(lengths: list[int]) -> None:
     plt.show()
 
 
-def visualize_path(sequence: list[str]) -> None:
+def visualize_path(sequence: list[str], title: str) -> None:
     """Visualizes a specific path sequence using the networkx library.
         Each Wikipedia page in the sequence is illustrated as a node.
         The path taken is shown as directed connections between the nodes.
@@ -330,6 +352,7 @@ def visualize_path(sequence: list[str]) -> None:
     for i in range(len(sequence) - 1):
         nx_graph.add_edge(sequence[i], sequence[i + 1])
     plt.figure()
+    plt.title(title)
     nx.draw(nx_graph, with_labels=True)
     plt.show()
 
